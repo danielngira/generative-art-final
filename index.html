@@ -50,13 +50,14 @@
 
     for (let i = 0; i < progress; i++){
       const theta = i * t * 1.5; //this affects how tight the turns are
+      const spacing = theta * 3;
       
       angle += 0.1;
       currentGap += gap / 100
       
-      //Use either angle or theta
-      const x = Math.cos(theta) * currentGap
-      const y = Math.sin(theta) * currentGap
+      //Use either angle and currentGap or theta and spacing
+      const x = Math.cos(theta) * spacing;
+      const y = Math.sin(theta) * spacing;
       
       ctx.lineTo(x,y);
     }
