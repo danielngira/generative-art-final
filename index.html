@@ -3,6 +3,11 @@
 /* global nn */
   let canvas, ctx
   progress = 0
+  const THETA_MULTIPLIER = 0.5
+  const SPACING_MULTIPLIER = 3
+  let stage1Text = ["watch", "learn", "truth", "wake up"];
+  let stage2Text = ["they lied", "open your eyes", "enemy", "corrupt"];
+  let stage3Text = ["PURE", "OBEY", "9999", "TRUTH???", "NO NO NO"];
   
   function setup() {
     nn.get('body').css('margin', 0)
@@ -13,6 +18,10 @@
       .addTo('body')
     
     ctx = canvas.getContext('2d')
+    ctx.font = "40px serif";
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; 
+    ctx.shadowBlur = 10;                
+    ctx.shadowOffsetX = 5;            
   }
   
   function resize () {
@@ -45,8 +54,8 @@
     for (let i = 0; i < progress; i++){
       // playing around with the rotation value theta led 
       // to the dynamic shapes. At low values it was just a spiral
-      const theta = i * t * 0.5; //this affects how tight the turns are
-      const spacing = theta * 3; // Radius from center
+      const theta = i * t * THETA_MULTIPLIER; //this affects how tight the turns are
+      const spacing = theta * SPACING_MULTIPLIER; // Radius from center
       
       angle += 0.1;
       currentGap += gap / 100
@@ -56,7 +65,7 @@
       const x = Math.cos(theta) * spacing;
       const y = Math.sin(theta) * spacing;
       
-      ctx.lineTo(x,y);
+      ctx.lineTo(x,y); 
     }
     
     ctx.stroke(); //draw the line
@@ -71,6 +80,25 @@
     
     //control how many points in spiral there are
     progress += 1;
+    
+    let words;
+
+    if (progress < 1000) {
+      words = stage1Text;
+    } else if (progress < 2000) {
+      words = stage2Text;
+    } else {
+      words = stage3Text;
+    }
+    
+    let word = words[Math.floor(Math.random() * words.length)];
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    if (progress % 10 === 0){
+      ctx.fillText(word, nn.width/2, nn.height/2);
+    }
     
     drawSpiral(30, progress);
   }
