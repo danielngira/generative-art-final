@@ -5,12 +5,100 @@
   progress = 0
   const THETA_MULTIPLIER = 0.5
   const SPACING_MULTIPLIER = 3
-  let stage1Text = ["watch", "learn", "truth", "wake up"];
-  let stage2Text = ["they lied", "open your eyes", "enemy", "corrupt"];
-  let stage3Text = ["PURE", "OBEY", "9999", "TRUTH???", "NO NO NO"];
+  let wordChangeRate = 60;
+  let isMouseDown = false;
+  
+  let groundingText = [
+  "pause",
+  "breathe",
+  "reflect",
+  "step back",
+  "verify",
+  "think",
+  "question the feed",
+  "log off",
+  "slow down",
+  "talk to someone",
+  "check sources",
+  "be careful"
+];
+  
+  let stage1Text = [
+  "watch",
+  "learn",
+  "truth",
+  "wake up",
+  "look closer",
+  "just curious",
+  "one more",
+  "interesting",
+  "hidden",
+  "question",
+  "listen",
+  "research",
+  "connect",
+  "notice",
+  "follow"
+];
+
+let stage2Text = [
+  "they lied",
+  "open your eyes",
+  "enemy",
+  "corrupt",
+  "wake them up",
+  "you see it now",
+  "not a coincidence",
+  "they know",
+  "the system",
+  "trust no one",
+  "controlled",
+  "betrayed",
+  "the others",
+  "fake news",
+  "proof everywhere",
+  "everyone is blind",
+  "follow the pattern",
+  "they are afraid",
+  "no going back"
+];
+
+let stage3Text = [
+  "PURE",
+  "OBEY",
+  "9999",
+  "TRUTH???",
+  "NO NO NO",
+  "THEY KNOW",
+  "ONLY US",
+  "WAKE WAKE WAKE",
+  "CONTROL",
+  "STATIC",
+  "SIGNAL",
+  "PATTERN PATTERN",
+  "EYES OPEN",
+  "NO EXIT",
+  "REPEAT",
+  "BELIEVE",
+  "THE LOOP",
+  "INSIDE",
+  "AGAIN AGAIN",
+  "///TRUTH///",
+  "ERROR",
+  "NULL",
+  "010101",
+  "THE CENTER",
+  "LOUDER",
+  "NOISE",
+  "ALL TRUE",
+  "ALL FALSE",
+  "SEE SEE SEE"
+];
   
   function setup() {
     nn.get('body').css('margin', 0)
+    
+
     
     canvas = nn.create('canvas')
       .position(0, 0)
@@ -18,10 +106,17 @@
       .addTo('body')
     
     ctx = canvas.getContext('2d')
-    ctx.font = "40px serif";
     ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'; 
     ctx.shadowBlur = 10;                
-    ctx.shadowOffsetX = 5;            
+    ctx.shadowOffsetX = 5;  
+    
+    canvas.addEventListener("mousedown", () => {
+      isMouseDown = true;
+    });
+
+    window.addEventListener("mouseup", () => {
+      isMouseDown = false;
+    });
   }
   
   function resize () {
@@ -41,7 +136,6 @@
     
     //Start path
     ctx.beginPath();
-    ctx.strokeStyle = 'pink';
     ctx.lineWidth = 2;
     
     let angle = 0;
@@ -83,28 +177,37 @@
     
     let words;
 
-    if (progress < 1000) {
-      words = stage1Text;
-    } else if (progress < 2000) {
-      words = stage2Text;
-    } else {
-      words = stage3Text;
+    if (isMouseDown) {
+        words = groundingText;
+        ctx.strokeStyle = 'green';
+    } else{
+      if (progress < 1000) {
+        words = stage1Text;
+        ctx.strokeStyle = 'pink';
+      } else if (progress < 2000) {
+        words = stage2Text;
+        ctx.strokeStyle = 'orange';
+      } else {
+        words = stage3Text;
+        ctx.strokeStyle = 'red';
+      }
     }
     
-    let word = words[Math.floor(Math.random() * words.length)];
+    if (progress % wordChangeRate === 0) {
+      currentWord = words[Math.floor(Math.random() * words.length)];
+    }
+    
+    ctx.font = "40px serif";
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    if (progress % 10 === 0){
-      ctx.fillText(word, nn.width/2, nn.height/2);
-    }
-    
     drawSpiral(30, progress);
+    ctx.fillText(currentWord, nn.width/2, nn.height/2)
   }
   
-nn.on('load', setup)
-nn.on('resize', resize)
-nn.on('load', draw)
+  nn.on('load', setup)
+  nn.on('resize', resize)
+  nn.on('load', draw)
 </script>
 
