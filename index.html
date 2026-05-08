@@ -12,16 +12,8 @@
       .resize(nn.width, nn.height)
       .addTo('body')
     
-    // Canvas dimensions
-    canvas.width = nn.width;
-    canvas.height = nn.height;
-  
-    canvas.fillStyle = 'black';
-    canvas.strokeStyle = 'white';
-    
     ctx = canvas.getContext('2d')
   }
-  
   
   function resize () {
     canvas.resize(nn.width, nn.height)
@@ -34,10 +26,11 @@
     cx = nn.width / 2
     cy = nn.height / 2 
     
-    //Move to the center
+    //Save state and move origin to the center
     ctx.save();
     ctx.translate(cx, cy);
     
+    //Start path
     ctx.beginPath();
     ctx.strokeStyle = 'pink';
     ctx.lineWidth = 2;
@@ -48,14 +41,18 @@
     // time since page started, will slowly change spiral
     const t = performance.now() * 0.0001 
 
+    // Loop to draw many points over time
     for (let i = 0; i < progress; i++){
-      const theta = i * t * 1.5; //this affects how tight the turns are
-      const spacing = theta * 3;
+      // playing around with the rotation value theta led 
+      // to the dynamic shapes. At low values it was just a spiral
+      const theta = i * t * 0.5; //this affects how tight the turns are
+      const spacing = theta * 3; // Radius from center
       
       angle += 0.1;
       currentGap += gap / 100
       
-      //Use either angle and currentGap or theta and spacing
+      //I use either angle and currentGap or theta and spacing
+      //convert the coordinates to canvas coordinates
       const x = Math.cos(theta) * spacing;
       const y = Math.sin(theta) * spacing;
       
@@ -71,13 +68,15 @@
     
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, nn.width, nn.height);
+    
+    //control how many points in spiral there are
     progress += 1;
     
     drawSpiral(30, progress);
   }
   
 nn.on('load', setup)
-nn.on('load', resize)
+nn.on('resize', resize)
 nn.on('load', draw)
 </script>
 
