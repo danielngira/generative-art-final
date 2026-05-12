@@ -85,22 +85,20 @@
     opacity: 0.55;
   }
 }
-  
 </style>
 
 <body>
-  <div id="outerContainer">
-    <div id="container">
-      <div class="breatheText">BREATHE</div>
-      
-      <div class="item">
-        <img src="./balloon.png"/>
-      </div>
-      <div class="circle" style="animation-delay: -3s"></div>
-      <div class="circle" style="animation-delay: -2s"></div>
-      <div class="circle" style="animation-delay: -1s"></div>
-      <div class="circle" style="animation-delay: 0s"></div>
+  <div id="container">
+    <div class="breatheText">BREATHE</div>
+
+    <div class="item">
+      <img src="./balloon.png"/>
     </div>
+    
+    <div class="circle" style="animation-delay: -3s"></div>
+    <div class="circle" style="animation-delay: -2s"></div>
+    <div class="circle" style="animation-delay: -1s"></div>
+    <div class="circle" style="animation-delay: 0s"></div>
   </div>
 </body>
 
@@ -110,12 +108,13 @@
   const THETA_MULTIPLIER = 0.5;
   const SPACING_MULTIPLIER = 3;
   const RESET_AFTER = 5 * 60 * 1000;
+  const WORD_CHANGE_RATE = 60;
   
   let canvas, ctx;
   let progress = 0;
-  let wordChangeRate = 60;
   let isMouseDown = false;
   let startTime = 0;
+  let currentWord = "";
   
   let stage1Text = [
   "family values",
@@ -196,9 +195,7 @@ let stage3Text = [
   "SEE SEE SEE"
 ];
   
-  function setup() {
-    nn.get('body').css('margin', 0)
-    
+  function setup() {    
     canvas = nn.create('canvas')
       .position(0, 0)
       .resize(nn.width, nn.height)
@@ -220,8 +217,6 @@ let stage3Text = [
   
   function resize () {
     canvas.resize(nn.width, nn.height)
-    // anything that should update
-    // when page resizes, goes here
   }
   
   //reset the spiral 
@@ -234,7 +229,7 @@ let stage3Text = [
     ctx.fillRect(0, 0, nn.width, nn.height)
   }
   
-  function drawSpiral(gap, progress) {
+  function drawSpiral(progress) {
     // midpoint in canvas
     cx = nn.width / 2
     cy = nn.height / 2 
@@ -247,9 +242,6 @@ let stage3Text = [
     ctx.beginPath();
     ctx.lineWidth = 2;
     
-    let angle = 0;
-    let currentGap = 0;
-    
     // time since spiral started, will slowly change spiral
     const t = (performance.now() - startTime) * 0.0001 
 
@@ -259,11 +251,7 @@ let stage3Text = [
       // to the dynamic shapes. At low values it was just a spiral
       const theta = i * t * THETA_MULTIPLIER; //this affects how tight the turns are
       const spacing = theta * SPACING_MULTIPLIER; // Radius from center
-      
-      angle += 0.1;
-      currentGap += gap / 100
-      
-      //I use either angle and currentGap or theta and spacing
+            
       //convert the coordinates to canvas coordinates
       const x = Math.cos(theta) * spacing;
       const y = Math.sin(theta) * spacing;
@@ -325,26 +313,22 @@ let stage3Text = [
       ctx.strokeStyle = 'red';
     }
 
-    
-    if (progress % wordChangeRate === 0) {
+    // Change the word every second
+    if (progress % WORD_CHANGE_RATE === 0) {
       currentWord = words[Math.floor(Math.random() * words.length)];
     }
     
+    // Value between 1 and -1 to control font size and opacity
     const pulse = Math.sin(performance.now() * 0.003);
-    
-    //val anywhere between 39 and 41
     const textSize = 40 + (pulse * 1);
-    
-    //val anywhere between 0.5 and 1
     const textOpacity = 0.75 + (pulse * 0.25);
     
-    //ctx.font = "40px serif";
     ctx.font = `${textSize}px serif`
     ctx.fillStyle = `rgba(255, 255, 255, ${textOpacity})`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    drawSpiral(30, progress);
+    drawSpiral(progress);
     ctx.fillText(currentWord, nn.width/2, nn.height/2)
   }
   
