@@ -1,4 +1,70 @@
 <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: black;
+  }
+  
+  #container {
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 999;
+    pointer-events: none;
+  }
+  
+  #container.active {
+    display: flex;
+  }
+  
+  .circle {
+    border-radius: 50%;
+    background-color: aquamarine;
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    animation: scaleIn 4s infinite cubic-bezier(.36, .11, .89, .32);
+  }
+  
+  .item {
+    position: relative;
+    z-index: 2;
+    top: 25px;
+    padding: 5px;
+  }
+
+  .item img {
+    width: 150px;
+  }
+  
+  @keyframes scaleIn {
+    0% {transform: scale(.5, .5); opacity: .5;}
+    100% {transform: scale(2.5, 2.5); opacity: 0;}
+  }
+  
+</style>
+
+<body>
+  <div id="outerContainer">
+    <div id="container">
+      <div class="item">
+        <img src="./balloon.png"/>
+      </div>
+      <div class="circle" style="animation-delay: -3s"></div>
+      <div class="circle" style="animation-delay: -2s"></div>
+      <div class="circle" style="animation-delay: -1s"></div>
+      <div class="circle" style="animation-delay: 0s"></div>
+    </div>
+  </div>
+</body>
+
 <script>
 /* global nn */
   let canvas, ctx
@@ -7,21 +73,6 @@
   const SPACING_MULTIPLIER = 3
   let wordChangeRate = 60;
   let isMouseDown = false;
-  
-  let groundingText = [
-  "pause",
-  "breathe",
-  "reflect",
-  "step back",
-  "verify",
-  "think",
-  "question the feed",
-  "log off",
-  "slow down",
-  "talk to someone",
-  "check sources",
-  "be careful"
-];
   
   let stage1Text = [
   "watch",
@@ -98,8 +149,6 @@ let stage3Text = [
   function setup() {
     nn.get('body').css('margin', 0)
     
-
-    
     canvas = nn.create('canvas')
       .position(0, 0)
       .resize(nn.width, nn.height)
@@ -165,9 +214,30 @@ let stage3Text = [
     ctx.stroke(); //draw the line
     ctx.restore(); //return to most recent state
   }
-  //
+  
+  function touchGrass() {
+    pulse = document.getElementById("container");
+    pulse.classList.add("active");
+  }
+  
+  function hideGrass () {
+    pulse = document.getElementById("container");
+    pulse.classList.remove("active");
+  }
+
   function draw() {
     requestAnimationFrame(draw)
+    
+    if (isMouseDown) {
+      //don't draw spiral
+      touchGrass();
+      canvas.style.display = "none";
+      progress = 0;
+      return;
+    } else {
+      canvas.style.display = "";
+      hideGrass();
+    }
     
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, nn.width, nn.height);
@@ -176,22 +246,19 @@ let stage3Text = [
     progress += 1;
     
     let words;
-
-    if (isMouseDown) {
-        words = groundingText;
-        ctx.strokeStyle = 'green';
-    } else{
-      if (progress < 1000) {
-        words = stage1Text;
-        ctx.strokeStyle = 'pink';
-      } else if (progress < 2000) {
-        words = stage2Text;
-        ctx.strokeStyle = 'orange';
-      } else {
-        words = stage3Text;
-        ctx.strokeStyle = 'red';
-      }
+  
+    canvas.style.display = ""
+    if (progress < 1000) {
+      words = stage1Text;
+      ctx.strokeStyle = 'pink';
+    } else if (progress < 2000) {
+      words = stage2Text;
+      ctx.strokeStyle = 'orange';
+    } else {
+      words = stage3Text;
+      ctx.strokeStyle = 'red';
     }
+
     
     if (progress % wordChangeRate === 0) {
       currentWord = words[Math.floor(Math.random() * words.length)];
