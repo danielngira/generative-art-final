@@ -100,18 +100,26 @@
       <div class="circle" style="animation-delay: -2s"></div>
       <div class="circle" style="animation-delay: -1s"></div>
       <div class="circle" style="animation-delay: 0s"></div>
+      <audio controls>
+        <source src="./horse.ogg" type="audio/ogg">
+      Your browser does not support the audio element.
+      </audio>
     </div>
   </div>
 </body>
 
 <script>
 /* global nn */
-  let canvas, ctx
-  progress = 0
-  const THETA_MULTIPLIER = 0.5
-  const SPACING_MULTIPLIER = 3
+
+  const THETA_MULTIPLIER = 0.5;
+  const SPACING_MULTIPLIER = 3;
+  const RESET_AFTER = 5 * 60 * 1000;
+  
+  let canvas, ctx;
+  let progress = 0;
   let wordChangeRate = 60;
   let isMouseDown = false;
+  let startTime = 0;
   
   let stage1Text = [
   "family values",
@@ -219,6 +227,16 @@ let stage3Text = [
     // when page resizes, goes here
   }
   
+  //reset the spiral 
+  function resetSpiral() {
+    startTime = performance.now()
+    progress = 0;
+    currentWord = stage1Text[Math.floor(Math.random() * stage1Text.length)]
+    
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, nn.width, nn.height)
+  }
+  
   function drawSpiral(gap, progress) {
     // midpoint in canvas
     cx = nn.width / 2
@@ -235,8 +253,8 @@ let stage3Text = [
     let angle = 0;
     let currentGap = 0;
     
-    // time since page started, will slowly change spiral
-    const t = performance.now() * 0.0001 
+    // time since spiral started, will slowly change spiral
+    const t = (performance.now() - startTime) * 0.0001 
 
     // Loop to draw many points over time
     for (let i = 0; i < progress; i++){
@@ -273,11 +291,17 @@ let stage3Text = [
   function draw() {
     requestAnimationFrame(draw)
     
+    // restart spiral after 5 mins
+    if (performance.now - startTime >= RESET_AFTER){
+      resetSpiral()
+    }
+    
     if (isMouseDown) {
       //don't draw spiral
       touchGrass();
       canvas.style.display = "none";
       progress = 0;
+      resetSpiral();
       return;
     } else {
       canvas.style.display = "";
