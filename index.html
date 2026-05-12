@@ -289,7 +289,7 @@ let stage3Text = [
     requestAnimationFrame(draw)
     
     // restart spiral after 5 mins
-    if (performance.now - startTime >= RESET_AFTER){
+    if (performance.now() - startTime >= RESET_AFTER){
       resetSpiral()
     }
     
@@ -330,8 +330,17 @@ let stage3Text = [
       currentWord = words[Math.floor(Math.random() * words.length)];
     }
     
-    ctx.font = "40px serif";
-    ctx.fillStyle = "white";
+    const pulse = Math.sin(performance.now() * 0.003);
+    
+    //val anywhere between 39 and 41
+    const textSize = 40 + (pulse * 1);
+    
+    //val anywhere between 0.5 and 1
+    const textOpacity = 0.75 + (pulse * 0.25);
+    
+    //ctx.font = "40px serif";
+    ctx.font = `${textSize}px serif`
+    ctx.fillStyle = `rgba(255, 255, 255, ${textOpacity})`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
